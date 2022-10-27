@@ -2108,14 +2108,93 @@ class main(QMainWindow):
         subinputname=self.temp_input_list
         for title in file2:
             new_commandlist = []
-            for command in file2[title][2]:
-                if '<' in command or '>' in command:
+        for command in file2[title][2]:
+            if '<' in command or '>' in command:
+                if 'input' in command.lower() and '2:' not in command and command.count('<')>1:
+                    print(command)
+                    cmdlist = command.split('<')
+                    cmdfinal = []
+                    temp_input = self.temp_input_list
+                    count_sub = command.count('<')
+                    input_count = command.lower().count('input')
+                    if count_sub>=input_count:
+                        count_sub = input_count
+                    else:
+                        pass
+                    sub_start = 0
+                    for cmd in cmdlist:
+                        tempcmdfinal = cmdfinal
+                        if '>' in cmd:
+                            cmd = cmd.split('>')
+                            if 'input' in cmd[0] or 'Input' in cmd[0]:
+                                cmdfinal = []
+                                if 'main' in cmd[0]:
+                                    if tempcmdfinal != []:
+                                        for tempcmd in tempcmdfinal:
+                                            if tempcmd[-1] != ' ':
+                                                cmdfinal.append(tempcmd+' '+subinput2)
+                                            else:
+                                                cmdfinal.append(tempcmd+subinput2)
+                                    else:
+                                        cmdfinal.append(subinput2)
+                                    try:
+                                        temp_input.remove(subinput2)
+                                    except:pass
+                                    count_sub-=1
+                                else:
+                                    if tempcmdfinal != []:
+                                        if count_sub>1 and len(tempcmdfinal)>1:
+                                            count_n = 0
+                                            print(temp_input[sub_start:],'count_sub=',count_sub)
+                                            for data in temp_input[sub_start:]:
+                                                temp_num = temp_input[sub_start:].index(data)
+                                                if temp_num%count_sub==0:
+                                                    tempcmd = tempcmdfinal[count_n]
+                                                    # print(tempcmd)
+                                                    if tempcmd[-1] != ' ':
+                                                        cmdfinal.append(tempcmd+' '+data)
+                                                    else:
+                                                        cmdfinal.append(tempcmd+data)
+                                                    count_n+=1
+                                 
+                                        else:
+                                            for data in temp_input[sub_start:]:
+                                                temp_num = temp_input[sub_start:].index(data)
+                                                if temp_num%count_sub==0:
+                                                    for tempcmd in tempcmdfinal:
+                                                        if tempcmd[-1] != ' ':
+                                                            cmdfinal.append(tempcmd+' '+data)
+                                                        else:
+                                                            cmdfinal.append(tempcmd+data)
+                                        sub_start+=1
+                                    else:
+                                        print(temp_input[sub_start:],'count_sub=',count_sub)
+                                        for data in temp_input[sub_start:]:
+                                            temp_num = temp_input[sub_start:].index(data)
+                                            if temp_num%count_sub==0:
+                                                for tempcmd in tempcmdfinal:
+                                                    cmdfinal.append(data)
+                                        sub_start+=1
+                        else:
+                            cmdfinal = []
+                            if tempcmdfinal != []:
+                                for tempcmd in tempcmdfinal:
+                                    if tempcmd[-1] != ' ':
+                                        cmdfinal.append(tempcmd+' '+cmd)
+                                    else:
+                                        cmdfinal.append(tempcmd+cmd)
+                            else:
+                                cmdfinal = [cmd]
+                    for item in cmdfinal:
+                        print(item)
+                        new_commandlist.append(item)
+                else:
                     '''
                     add
                     '''
                     cmdlist = command.split('<')
                     cmdfinal = []
-                    print(cmdlist)
+                    # print(cmdlist)
                     for cmd in cmdlist:
                         tempcmdfinal = cmdfinal
                         if '>' in cmd:
@@ -2184,9 +2263,9 @@ class main(QMainWindow):
                                 cmdfinal = [cmd]
                     for item in cmdfinal:
                         new_commandlist.append(item)
-                else:
-                    new_commandlist.append(command)
-            file2[title][2] = new_commandlist
+            else:
+                new_commandlist.append(command)
+        file2[title][2] = new_commandlist
         return file2
     def start_mode(self,mode):
         os.system(terminal_cmd)
